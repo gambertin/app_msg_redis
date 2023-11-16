@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
+// import 'dart:math';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:english_words/english_words.dart';
+// import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-
+import 'package:win_toast/win_toast.dart';
 
 final channel = WebSocketChannel.connect(
   // Uri.parse('wss://echo.websocket.events'),
@@ -26,7 +26,7 @@ void main() async {
     win.minSize = initialSize;
     win.size = initialSize;
     win.alignment = Alignment.center;
-    win.title = "How to use system tray with Flutter";
+    win.title = "Kerno's notifications";
     win.show();
   });
 }
@@ -39,6 +39,8 @@ String getTrayImagePath(String imageName) {
 String getImagePath(String imageName) {
   return Platform.isWindows ? './images/$imageName.bmp' : './images/$imageName.png';
 }
+
+
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -62,6 +64,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initSystemTray();
+    initializeToast();
   }
 
   @override
@@ -70,12 +73,25 @@ class _MyAppState extends State<MyApp> {
     _timer?.cancel();
   }
 
-  Future<void> initSystemTray() async {
-    List<String> iconList = ['darts_icon', 'gift_icon'];
+  void initializeToast() {
+// initialize toast with you aumId, displayName and iconPath
+    scheduleMicrotask(() async {
+      await WinToast.instance().initialize(
+      aumId: 'one.mixin.WinToastExample',
+      displayName: 'Kerno\'s Application',
+      iconPath: '',
+      clsid: 'your-notification-activator-guid-2EB1AE5198B7',
+    );});
+  }
 
+  Future<void> initSystemTray() async {
+    // List<String> iconList = ['darts_icon', 'gift_icon'];
+
+    debugPrint("antes de inicilizar el tray");
+    debugPrint(" pepe  $getTrayImagePath('app_icon')");
     // We first init the systray menu and then add the menu entries
-    await _systemTray.initSystemTray(iconPath: getTrayImagePath('app_icon'));
-    // await _systemTray.initSystemTray(iconPath: './images/app_icon.ico');
+    // await _systemTray.initSystemTray(iconPath: getTrayImagePath('app_icon'));
+    await _systemTray.initSystemTray(iconPath: './images/app_icon.ico');
     _systemTray.setTitle("system tray");
     _systemTray.setToolTip("How to use system tray with Flutter");
 
@@ -113,7 +129,7 @@ class _MyAppState extends State<MyApp> {
             _timer ??= Timer.periodic(
               const Duration(milliseconds: 500),
               (timer) {
-                channel.sink.add(DateTime.now().toString() + ' Icon flash started');
+                channel.sink.add('${DateTime.now()} Icon flash started');
                 _toogleTrayIcon = !_toogleTrayIcon;
                 _systemTray.setImage(_toogleTrayIcon ? "" : getTrayImagePath('app_icon'));
               },
@@ -125,7 +141,7 @@ class _MyAppState extends State<MyApp> {
           image: getImagePath('darts_icon'),
           onClicked: (menuItem) {
             debugPrint("Stop flash tray icon");
-            channel.sink.add(DateTime.now().toString() + ' Icon flash stoped');
+            channel.sink.add('${DateTime.now()} Icon flash stoped');
 
             _timer?.cancel();
             _timer = null;
@@ -134,82 +150,82 @@ class _MyAppState extends State<MyApp> {
           },
         ),
         MenuSeparator(),
-        SubMenu(
-          label: "Test API",
-          image: getImagePath('gift_icon'),
-          children: [
-            SubMenu(
-              label: "setSystemTrayInfo",
-              image: getImagePath('darts_icon'),
-              children: [
-                MenuItemLabel(
-                  label: 'setTitle',
-                  image: getImagePath('darts_icon'),
-                  onClicked: (menuItem) {
-                    final String text = WordPair.random().asPascalCase;
-                    debugPrint("click 'setTitle' : $text");
-                    _systemTray.setTitle(text);
-                  },
-                ),
-                MenuItemLabel(
-                  label: 'setImage',
-                  image: getImagePath('gift_icon'),
-                  onClicked: (menuItem) {
-                    String iconName = iconList[Random().nextInt(iconList.length)];
-                    String path = getTrayImagePath(iconName);
-                    debugPrint("click 'setImage' : $path");
-                    _systemTray.setImage(path);
-                  },
-                ),
-                MenuItemLabel(
-                  label: 'setToolTip',
-                  image: getImagePath('darts_icon'),
-                  onClicked: (menuItem) {
-                    final String text = WordPair.random().asPascalCase;
-                    debugPrint("click 'setToolTip' : $text");
-                    _systemTray.setToolTip(text);
-                  },
-                ),
-                MenuItemLabel(
-                  label: 'getTitle',
-                  image: getImagePath('gift_icon'),
-                  onClicked: (menuItem) async {
-                    String title = await _systemTray.getTitle();
-                    debugPrint("click 'getTitle' : $title");
-                  },
-                ),
-              ],
-            ),
-            MenuItemLabel(label: 'disabled Item', name: 'disableItem', image: getImagePath('gift_icon'), enabled: false),
-          ],
-        ),
-        MenuSeparator(),
-        MenuItemLabel(
-          label: 'Set Item Image',
-          onClicked: (menuItem) async {
-            debugPrint("click 'SetItemImage'");
+        // SubMenu(
+        //   label: "Test API",
+        //   image: getImagePath('gift_icon'),
+        //   children: [
+        //     SubMenu(
+        //       label: "setSystemTrayInfo",
+        //       image: getImagePath('darts_icon'),
+        //       children: [
+        //         MenuItemLabel(
+        //           label: 'setTitle',
+        //           image: getImagePath('darts_icon'),
+        //           onClicked: (menuItem) {
+        //             final String text = WordPair.random().asPascalCase;
+        //             debugPrint("click 'setTitle' : $text");
+        //             _systemTray.setTitle(text);
+        //           },
+        //         ),
+        //         MenuItemLabel(
+        //           label: 'setImage',
+        //           image: getImagePath('gift_icon'),
+        //           onClicked: (menuItem) {
+        //             String iconName = iconList[Random().nextInt(iconList.length)];
+        //             String path = getTrayImagePath(iconName);
+        //             debugPrint("click 'setImage' : $path");
+        //             _systemTray.setImage(path);
+        //           },
+        //         ),
+        //         MenuItemLabel(
+        //           label: 'setToolTip',
+        //           image: getImagePath('darts_icon'),
+        //           onClicked: (menuItem) {
+        //             final String text = WordPair.random().asPascalCase;
+        //             debugPrint("click 'setToolTip' : $text");
+        //             _systemTray.setToolTip(text);
+        //           },
+        //         ),
+        //         MenuItemLabel(
+        //           label: 'getTitle',
+        //           image: getImagePath('gift_icon'),
+        //           onClicked: (menuItem) async {
+        //             String title = await _systemTray.getTitle();
+        //             debugPrint("click 'getTitle' : $title");
+        //           },
+        //         ),
+        //       ],
+        //     ),
+        //     MenuItemLabel(label: 'disabled Item', name: 'disableItem', image: getImagePath('gift_icon'), enabled: false),
+        //   ],
+        // ),
+        // MenuSeparator(),
+        // MenuItemLabel(
+        //   label: 'Set Item Image',
+        //   onClicked: (menuItem) async {
+        //     debugPrint("click 'SetItemImage'");
 
-            String iconName = iconList[Random().nextInt(iconList.length)];
-            String path = getImagePath(iconName);
+        //     String iconName = iconList[Random().nextInt(iconList.length)];
+        //     String path = getImagePath(iconName);
 
-            await menuItem.setImage(path);
-            debugPrint("click name: ${menuItem.name} menuItemId: ${menuItem.menuItemId} label: ${menuItem.label} image: ${menuItem.image}");
-          },
-        ),
-        MenuItemCheckbox(
-          label: 'Checkbox 1',
-          name: 'checkbox1',
-          checked: true,
-          onClicked: (menuItem) async {
-            debugPrint("click 'Checkbox 1'");
+        //     await menuItem.setImage(path);
+        //     debugPrint("click name: ${menuItem.name} menuItemId: ${menuItem.menuItemId} label: ${menuItem.label} image: ${menuItem.image}");
+        //   },
+        // ),
+        // MenuItemCheckbox(
+        //   label: 'Checkbox 1',
+        //   name: 'checkbox1',
+        //   checked: true,
+        //   onClicked: (menuItem) async {
+        //     debugPrint("click 'Checkbox 1'");
 
-            MenuItemCheckbox? checkbox1 = _menuMain.findItemByName<MenuItemCheckbox>("checkbox1");
-            await checkbox1?.setCheck(!checkbox1.checked);
+        //     MenuItemCheckbox? checkbox1 = _menuMain.findItemByName<MenuItemCheckbox>("checkbox1");
+        //     await checkbox1?.setCheck(!checkbox1.checked);
 
-            debugPrint("click name: ${checkbox1?.name} menuItemId: ${checkbox1?.menuItemId} label: ${checkbox1?.label} checked: ${checkbox1?.checked}");
-          },
-        ),
-        MenuSeparator(),
+        //     debugPrint("click name: ${checkbox1?.name} menuItemId: ${checkbox1?.menuItemId} label: ${checkbox1?.label} checked: ${checkbox1?.checked}");
+        //   },
+        // ),
+        // MenuSeparator(),
         MenuItemLabel(label: 'Exit', onClicked: (menuItem) => _appWindow.close()),
       ],
     );
@@ -291,11 +307,16 @@ class ContentBody extends StatelessWidget {
   final SystemTray systemTray;
   final Menu menu;
 
-  ContentBody({
-    Key? key,
+  const ContentBody({
+    super.key,
     required this.systemTray,
     required this.menu,
-  }) : super(key: key);
+  });
+// const ContentBody({
+//     Key? key,
+//     required this.systemTray,
+//     required this.menu,
+//   }) : super(key: key);
 
   // final channel = WebSocketChannel.connect(
   //   Uri.parse('wss://echo.websocket.events'),
@@ -321,7 +342,7 @@ class ContentBody extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'systemTray.initSystemTray',
+                      'Receiving msg from server_msg_redis',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                       ),
@@ -332,9 +353,9 @@ class ContentBody extends StatelessWidget {
                         return Text(snapshot.hasData ? '${snapshot.data}' : '');
                       },
                     ),
-                    const Text(
-                      'Create system tray.',
-                    ),
+                    // const Text(
+                    //   'Create system tray.',
+                    // ),
                     const SizedBox(
                       height: 12.0,
                     ),
@@ -364,21 +385,110 @@ class ContentBody extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'systemTray.destroy',
+                      'Show toast with custom XML.',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const Text(
-                      'Destroy system tray.',
-                    ),
+                    // const Text(
+                    //   'Toast test.',
+                    // ),
                     const SizedBox(
                       height: 12.0,
                     ),
                     ElevatedButton(
-                      child: const Text("destroy"),
+                      child: const Text("Show toast"),
                       onPressed: () async {
-                        await systemTray.destroy();
+                        const xml = """
+<?xml version="1.0" encoding="UTF-8"?>
+<toast launch="action=viewConversation&amp;conversationId=9813">
+   <visual>
+      <binding template="ToastGeneric">
+         <text>Kerno sent you a message </text>
+         <text>Check this out, Happy Canyon in Utah!</text>
+      </binding>
+   </visual>
+   <actions>
+      <input id="tbReply" type="text" placeHolderContent="Type a reply" />
+      <action content="Reply" activationType="background" arguments="action=reply&amp;conversationId=9813" />
+      <action content="Like" activationType="background" arguments="action=like&amp;conversationId=9813" />
+      <action content="View" activationType="background" arguments="action=viewImage&amp;imageUrl=https://picsum.photos/364/202?image=883" />
+   </actions>
+</toast>
+            """;
+                        try {
+                          await WinToast.instance().showCustomToast(xml: xml);
+                        } catch (error, stacktrace) {
+                          debugPrint("Error en el toast ");
+                        }
+                        debugPrint("despues del toast");
+                        // await systemTray.destroy();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Card(
+              elevation: 2.0,
+              margin: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Show toast with builder.',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    // const Text(
+                    //   'Toast test.',
+                    // ),
+                    const SizedBox(
+                      height: 12.0,
+                    ),
+                    ElevatedButton(
+                      child: const Text("Show toast"),
+                      onPressed: () async {
+                        try {
+                          await WinToast.instance().showToast(
+                            toast: Toast(
+                              duration: ToastDuration.short,
+                              launch: 'action=viewConversation&conversationId=9813',
+                              children: [
+                                // ToastChildAudio(source: ToastAudioSource.defaultSound),
+                                ToastChildAudio(source: ToastAudioSource.alarm10),
+                                ToastChildVisual(
+                                  binding: ToastVisualBinding(
+                                    children: [
+                                      ToastVisualBindingChildText(
+                                        text: 'HelloWorld',
+                                        id: 1,
+                                      ),
+                                      ToastVisualBindingChildText(
+                                        text: 'by Kerno\'s notifications',
+                                        id: 2,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ToastChildActions(children: [
+                                  ToastAction(
+                                    content: "Close",
+                                    arguments: "close_argument",
+                                  )
+                                ]),
+                              ],
+                            ),
+                          );
+                        } catch (error, stacktrace) {
+                          // i('showTextToast error: $error, $stacktrace');
+                        }
                       },
                     ),
                   ],

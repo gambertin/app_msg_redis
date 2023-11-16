@@ -5,7 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
   system_tray
-  windows_notification
+  win_toast
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

@@ -8,13 +8,13 @@
 
 #include <bitsdojo_window_windows/bitsdojo_window_plugin.h>
 #include <system_tray/system_tray_plugin.h>
-#include <windows_notification/windows_notification_plugin_c_api.h>
+#include <win_toast/win_toast_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   BitsdojoWindowPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("BitsdojoWindowPlugin"));
   SystemTrayPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("SystemTrayPlugin"));
-  WindowsNotificationPluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("WindowsNotificationPluginCApi"));
+  WinToastPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("WinToastPlugin"));
 }
